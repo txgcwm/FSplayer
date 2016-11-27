@@ -4,8 +4,9 @@
 #include <iostream>
 #include <fstream>
 extern "C" {
-
-#include <libswresample\swresample.h>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
 
 }
 

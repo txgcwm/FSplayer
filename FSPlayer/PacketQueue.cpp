@@ -16,8 +16,9 @@ PacketQueue::PacketQueue()
 bool PacketQueue::enQueue(const AVPacket *packet)
 {
 	AVPacket *pkt = av_packet_alloc();
-	if (av_packet_ref(pkt, packet) < 0)
+	if (av_packet_ref(pkt, packet) < 0) {
 		return false;
+	}
 
 	SDL_LockMutex(mutex);
 	queue.push(*pkt);
@@ -27,6 +28,7 @@ bool PacketQueue::enQueue(const AVPacket *packet)
 
 	SDL_CondSignal(cond);
 	SDL_UnlockMutex(mutex);
+
 	return true;
 }
 
@@ -35,18 +37,15 @@ bool PacketQueue::deQueue(AVPacket *packet, bool block)
 	bool ret = false;
 
 	SDL_LockMutex(mutex);
-	while (true)
-	{
-		if (quit)
-		{
+
+	while (true) {
+		if (quit) {
 			ret = false;
 			break;
 		}
 
-		if (!queue.empty())
-		{
-			if (av_packet_ref(packet, &queue.front()) < 0)
-			{
+		if (!queue.empty()) {
+			if (av_packet_ref(packet, &queue.front()) < 0) {
 				ret = false;
 				break;
 			}
@@ -59,17 +58,15 @@ bool PacketQueue::deQueue(AVPacket *packet, bool block)
 
 			ret = true;
 			break;
-		}
-		else if (!block)
-		{
+		} else if (!block) {
 			ret = false;
 			break;
-		}
-		else
-		{
+		} else {
 			SDL_CondWait(cond, mutex);
 		}
 	}
+
 	SDL_UnlockMutex(mutex);
+
 	return ret;
 }

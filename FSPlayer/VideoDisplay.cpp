@@ -4,8 +4,8 @@
 
 extern "C"{
 
-#include <libswscale\swscale.h>
-#include <libavutil\time.h>
+#include <libswscale/swscale.h>
+#include <libavutil/time.h>
 
 }
 
@@ -32,19 +32,18 @@ void video_refresh_timer(void *userdata)
 	MediaState *media = (MediaState*)userdata;
 	VideoState *video = media->video;
 
-	if (video->stream_index >= 0)
-	{
-		if (video->videoq->queue.empty())
+	if (video->stream_index >= 0) {
+		if (video->videoq->queue.empty()) {
 			schedule_refresh(media, 1);
-		else
-		{
+		} else {
 			video->frameq.deQueue(&video->frame);
 
 			// 将视频同步到音频上，计算下一帧的延迟时间
 			double current_pts = *(double*)video->frame->opaque;
 			double delay = current_pts - video->frame_last_pts;
-			if (delay <= 0 || delay >= 1.0)
+			if (delay <= 0 || delay >= 1.0) {
 				delay = video->frame_last_delay;
+			}
 
 			video->frame_last_delay = delay;
 			video->frame_last_pts = current_pts;
@@ -56,17 +55,18 @@ void video_refresh_timer(void *userdata)
 
 			double threshold = (delay > SYNC_THRESHOLD) ? delay : SYNC_THRESHOLD;
 
-			if (fabs(diff) < NOSYNC_THRESHOLD) // 不同步
-			{
-				if (diff <= -threshold) // 慢了，delay设为0
+			if (fabs(diff) < NOSYNC_THRESHOLD) { // 不同步
+				if (diff <= -threshold) { // 慢了，delay设为0
 					delay = 0;
-				else if (diff >= threshold) // 快了，加倍delay
+				} else if (diff >= threshold) { // 快了，加倍delay
 					delay *= 2;
+				}
 			}
 			video->frame_timer += delay;
 			double actual_delay = video->frame_timer - static_cast<double>(av_gettime()) / 1000000.0;
-			if (actual_delay <= 0.010)
+			if (actual_delay <= 0.010) {
 				actual_delay = 0.010; 
+			}
 
 			schedule_refresh(media, static_cast<int>(actual_delay * 1000 + 0.5));
 
@@ -85,9 +85,9 @@ void video_refresh_timer(void *userdata)
 			sws_freeContext(sws_ctx);
 			av_frame_unref(video->frame);
 		}
-	}
-	else
-	{
+	} else {
 		schedule_refresh(media, 100);
 	}
+
+	return;
 }

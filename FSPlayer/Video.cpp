@@ -4,7 +4,7 @@
 
 extern "C"{
 
-#include <libswscale\swscale.h>
+#include <libswscale/swscale.h>
 
 }
 
@@ -88,7 +88,6 @@ double VideoState::synchronize(AVFrame *srcFrame, double pts)
 	return pts;
 }
 
-
 int  decode(void *arg)
 {
 	VideoState *video = (VideoState*)arg;
@@ -98,8 +97,7 @@ int  decode(void *arg)
 	AVPacket packet;
 	double pts;
 
-	while (true)
-	{
+	while (true) {
 		video->videoq->deQueue(&packet, true);
 
 		int ret = avcodec_send_packet(video->video_ctx, &packet);
@@ -126,7 +124,6 @@ int  decode(void *arg)
 
 		av_frame_unref(frame);
 	}
-
 
 	av_frame_free(&frame);
 

@@ -2,6 +2,9 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#include "SDL.h"
+#include "SDL_video.h"
+
 #include "PacketQueue.h"
 #include "FrameQueue.h"
 #include "Media.h"
